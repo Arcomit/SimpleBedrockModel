@@ -1,12 +1,11 @@
-package com.github.tartaricacid.simplebedrockmodel.client.manager;
+package com.github.tartaricacid.simplebedrockmodel.client.resource.manager;
 
 import com.github.tartaricacid.simplebedrockmodel.SimpleBedrockModel;
-import com.github.tartaricacid.simplebedrockmodel.client.bedrock.AbstractBedrockEntityModel;
+import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,13 +14,12 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Set;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 @Mod.EventBusSubscriber(modid = SimpleBedrockModel.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class BedrockEntityModelRegister<T extends AbstractBedrockEntityModel<? extends Entity>> {
-    public static BedrockEntityModelRegister INSTANCE = null;
-    private final BedrockEntityModelSet<T> modelSet;
+public class BedrockModelRegister {
+    public static BedrockModelRegister INSTANCE = null;
+    private final BedrockModelSet modelSet;
 
-    private BedrockEntityModelRegister(BedrockEntityModelSet<T> modelSet) {
+    private BedrockModelRegister(BedrockModelSet modelSet) {
         this.modelSet = modelSet;
     }
 
@@ -29,8 +27,8 @@ public class BedrockEntityModelRegister<T extends AbstractBedrockEntityModel<? e
     public static void onRegisterClientReloadListenersEvent(RegisterClientReloadListenersEvent event) {
         ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
         if (resourceManager instanceof ReloadableResourceManager manager) {
-            INSTANCE = new BedrockEntityModelRegister<>(new BedrockEntityModelSet<>());
-            ModLoader.get().postEvent(new BedrockEntityModelRegisterEvent(INSTANCE.modelSet));
+            INSTANCE = new BedrockModelRegister(new BedrockModelSet());
+            ModLoader.get().postEvent(new BedrockModelRegisterEvent(INSTANCE.modelSet));
             // 将注册冻结
             INSTANCE.modelSet.immutableKnowLocations();
             // 添加到最前面，避免实体读取模型时模型还没加载完成
@@ -38,7 +36,7 @@ public class BedrockEntityModelRegister<T extends AbstractBedrockEntityModel<? e
         }
     }
 
-    public AbstractBedrockEntityModel<? extends Entity> getModel(ResourceLocation location) {
+    public BedrockModel getModel(ResourceLocation location) {
         return modelSet.getModels().get(location);
     }
 

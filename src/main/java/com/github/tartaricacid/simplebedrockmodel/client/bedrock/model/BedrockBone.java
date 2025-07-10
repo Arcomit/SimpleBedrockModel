@@ -2,7 +2,6 @@ package com.github.tartaricacid.simplebedrockmodel.client.bedrock.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,24 +12,23 @@ import org.joml.Vector3f;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class BedrockPart {
+public class BedrockBone {
     private static final Vector3f[] NORMALS = new Vector3f[6];
     public final ObjectList<BedrockCube> cubes = new ObjectArrayList<>();
-    private final ObjectList<BedrockPart> children = new ObjectArrayList<>();
+    private final ObjectList<BedrockBone> children = new ObjectArrayList<>();
+    public BedrockBone parent;
+    public int index = -1;
     public float x;
     public float y;
     public float z;
     public float xRot;
     public float yRot;
     public float zRot;
-    public float offsetX;
-    public float offsetY;
-    public float offsetZ;
+    public float xScale = 1;
+    public float yScale = 1;
+    public float zScale = 1;
     public boolean visible = true;
     public boolean mirror;
-    private float initRotX;
-    private float initRotY;
-    private float initRotZ;
 
     static {
         for (int i = 0; i < NORMALS.length; i++) {
@@ -52,10 +50,10 @@ public class BedrockPart {
         if (this.visible) {
             if (!this.cubes.isEmpty() || !this.children.isEmpty()) {
                 poseStack.pushPose();
-                this.translateAndRotate(poseStack);
+                this.translateAndRotateAndScale(poseStack);
                 this.compile(poseStack.last(), consumer, texU, texV, red, green, blue, alpha);
 
-                for (BedrockPart part : this.children) {
+                for (BedrockBone part : this.children) {
                     part.render(poseStack, consumer, texU, texV, red, green, blue, alpha);
                 }
 
@@ -64,11 +62,15 @@ public class BedrockPart {
         }
     }
 
-    public void translateAndRotate(PoseStack poseStack) {
-        poseStack.translate((this.x / 16.0F) + this.offsetX, (this.y / 16.0F) + this.offsetY, (this.z / 16.0F) + this.offsetZ);
+    public void translateAndRotateAndScale(PoseStack poseStack) {
+        poseStack.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
         if (this.xRot != 0.0F || this.yRot != 0.0F || this.zRot != 0.0F) {
             poseStack.last().pose().rotateZYX(this.zRot, this.yRot, this.xRot);
             poseStack.last().normal().rotateZYX(this.zRot, this.yRot, this.xRot);
+        }
+        if (this.xScale != 0.0F || this.yScale != 0.0F || this.zScale != 0.0F) {
+            poseStack.last().pose().scale(this.xScale, this.yScale, this.zScale);
+            poseStack.last().normal().scale(this.xScale, this.yScale, this.zScale);
         }
     }
 
@@ -93,25 +95,11 @@ public class BedrockPart {
         return this.cubes.isEmpty();
     }
 
-    public void setInitRotationAngle(float x, float y, float z) {
-        this.initRotX = x;
-        this.initRotY = y;
-        this.initRotZ = z;
-    }
-
-    public float getInitRotX() {
-        return initRotX;
-    }
-
-    public float getInitRotY() {
-        return initRotY;
-    }
-
-    public float getInitRotZ() {
-        return initRotZ;
-    }
-
-    public void addChild(BedrockPart model) {
+    public void addChild(BedrockBone model) {
         this.children.add(model);
+    }
+
+    public ObjectList<BedrockBone> getChildren() {
+        return children;
     }
 }
