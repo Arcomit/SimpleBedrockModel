@@ -1,4 +1,4 @@
-package com.github.mcmodderanchor.simplebedrockmodel.v1.client.resource.manager;
+package example.client.manager;
 
 import com.github.mcmodderanchor.simplebedrockmodel.SimpleBedrockModel;
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.bedrock.model.BedrockModel;
@@ -34,7 +34,7 @@ public class BedrockModelSet extends SimplePreparableReloadListener<Void> {
         this.models = Maps.newHashMap();
         this.knowLocations.keySet().forEach(location -> {
             // 将 ID 转换成实际模型文件路径，默认是 <namespace>:models/<path>.json
-            ResourceLocation path = ResourceLocation.fromNamespaceAndPath(location.getNamespace(), "models/" + location.getPath() + ".json");
+            ResourceLocation path = new ResourceLocation(location.getNamespace(), "models/" + location.getPath() + ".json");
             Function<BedrockModelPOJO, ? extends BedrockModel> modelFunction = knowLocations.get(location);
             manager.getResource(path).ifPresentOrElse(model -> {
                 SimpleBedrockModel.LOGGER.info("Loading bedrock model file: {}", path);
