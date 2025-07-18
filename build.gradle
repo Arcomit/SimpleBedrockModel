@@ -1,8 +1,8 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.80'
+    id 'net.neoforged.moddev' version '2.0.+'
+    id "com.modrinth.minotaur" version "2.8.7"
 }
 
 version = mod_version
@@ -147,4 +147,17 @@ tasks.withType(JavaCompile).configureEach {
 java {
     // 编译源码文件，方便发布 maven
     withSourcesJar()
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+
+    projectId = mod_id
+    versionName = "${mod_id}-${version}"
+    versionNumber = mod_version
+    uploadFile = "${layout.buildDirectory.get()}/libs/${mod_id}-${version}.jar"
+    additionalFiles = ["${layout.buildDirectory.get()}/libs/${mod_id}-${version}-sources.jar"]
+    gameVersions = [minecraft_version]
+    loaders = ["neoforge"]
+    //debugMode = true
 }
