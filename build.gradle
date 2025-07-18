@@ -56,6 +56,10 @@ neoForge {
     }
 }
 
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+}
+
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 
@@ -87,15 +91,6 @@ dependencies {
     }
 }
 
-sourceSets.main.resources {
-    srcDir 'src/generated/resources'
-}
-
-tasks.compileJava {
-    // dsx137: 强制重新编译和生成 refmap.json 文件，避免偶发情况下该文件丢失问题
-    outputs.upToDateWhen { false }
-}
-
 // 用于 neoforge.mods 里替换那一堆 ${xxxx}
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
@@ -122,10 +117,17 @@ tasks.withType(ProcessResources).configureEach {
 jar {
     manifest {
         attributes([
-                "Implementation-Title"  : project.name,
-                "Implementation-Version": "${version}"
+                "Specification-Title"     : mod_id,
+                "Specification-Vendor"    : mod_authors,
+                "Specification-Version"   : version,
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : mod_authors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+    exclude 'example/**'
+    exclude 'assets/example/**'
 }
 
 // 让 idea 主动下载前置库的源码和 Javadoc
@@ -135,6 +137,11 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+// 必须，编码需要显式指定为 UTF
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 java {
