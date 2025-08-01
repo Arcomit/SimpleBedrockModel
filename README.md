@@ -70,7 +70,7 @@ dependencies {
 
 ### Loading a Bedrock Model
 
-**Approach 1: **You can listen to BedrockModelRegisterEvent and pass a Function<BedrockModelPOJO, ? extends BedrockModel> for initialization. This approach automatically handles resource bundle reloading.
+**Approach 1:** You can listen to BedrockModelRegisterEvent and pass a Function<BedrockModelPOJO, ? extends BedrockModel> for initialization. This approach automatically handles resource bundle reloading.
 
 ```java
 // Path: assets/modid/models/bedrock/block/test.json
@@ -102,7 +102,7 @@ BedrockModel model = new BedrockModel(pojo);
 
 ### Loading a Bedrock Animations
 
-**Animation Instance Construct: **A utility class "Animations" could help construct animation instance as long as you got the pojo.
+**Animation Instance Construct:** A utility class "Animations" could help construct animation instance as long as you got the pojo.
 
 ```java
 BedrockAnimationFile animationFilePojo = ...;
@@ -116,7 +116,7 @@ List<BedrockAnimation> animations = Animations.createAnimation(animationFilePojo
 BedrockAnimation animation = Animations.createAnimation("animation_name", animationPojo, indexProvider);
 ```
 
-**Approach 1: **You can listen to BedrockAnimationRegisterEvent and pass a Function<BedrockAnimationFile, Map<String, BedrockAnimation>> for initialization. This approach automatically handles resource bundle reloading.
+**Approach 1:** You can listen to BedrockAnimationRegisterEvent and pass a Function<BedrockAnimationFile, Map<String, BedrockAnimation>> for initialization. This approach automatically handles resource bundle reloading.
 
 ```java
 // Path: assets/modid/animations/bedrock/test.json
@@ -141,7 +141,7 @@ public void test() {
 
 **Approach 2:** Control data loading and initialization yourself. There is a utility class "GsonUtil" to help you do this:
 
-```
+```java
 BedrockModel model = ...;
 BoneIndexProvider indexProvider = new BedrockModelBoneIndexProvider(model);
 InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -184,7 +184,7 @@ model.renderToBuffer(poseStack, buffer, packedLight, packedOverlay);
 
 ### How to use animation blending
 
-[See the documentation of Mayday Animation Engine]([286799714/MaydayAnimationEngine](https://github.com/286799714/MaydayAnimationEngine))
+[See the documentation of Mayday Animation Engine](https://github.com/286799714/MaydayAnimationEngine)
 
 ## 🏗️ Project Structure
 
