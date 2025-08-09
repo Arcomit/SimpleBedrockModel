@@ -1,5 +1,7 @@
 package com.github.mcmodderanchor.simplebedrockmodel.v1.common.model;
 
+import com.maydaymemory.mae.basic.BoneTransform;
+import com.maydaymemory.mae.basic.ZYXRotationView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -23,6 +25,8 @@ public class BedrockBone {
     public float y;
     public float z;
     public Quaternionf rotation = new Quaternionf();
+    /** 这个旋转不会应用到渲染，只会用来生成 bind pose。*/
+    public Vector3f rotationInEuler = new Vector3f();
     public float xScale = 1;
     public float yScale = 1;
     public float zScale = 1;
@@ -89,6 +93,10 @@ public class BedrockBone {
         for (BedrockCube bedrockCube : this.cubes) {
             bedrockCube.compile(pose, NORMALS, consumer, lightmap, overlay, red, green, blue, alpha);
         }
+    }
+
+    public BoneTransform getBoneTransform() {
+        return new BoneTransform(index, new Vector3f(x, y, z), new ZYXRotationView(rotation), new Vector3f(xScale, yScale, zScale));
     }
 
     public boolean isEmpty() {
