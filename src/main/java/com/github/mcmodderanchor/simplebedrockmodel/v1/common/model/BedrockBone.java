@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -97,6 +98,18 @@ public class BedrockBone {
 
     public BoneTransform getBoneTransform() {
         return new BoneTransform(index, new Vector3f(x, y, z), new ZYXRotationView(rotation), new Vector3f(xScale, yScale, zScale));
+    }
+
+    public Matrix4f getGlobalTransform() {
+        Matrix4f matrix = new Matrix4f();
+        BedrockBone bone = this;
+        while (bone != null) {
+            matrix.scaleLocal(bone.xScale, bone.yScale, bone.zScale);
+            matrix.rotateLocal(bone.rotation);
+            matrix.translateLocal(bone.x / 16.0F, bone.y / 16.0F, bone.z / 16.0F);
+            bone = bone.parent;
+        }
+        return matrix;
     }
 
     public boolean isEmpty() {
