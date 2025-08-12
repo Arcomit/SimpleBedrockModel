@@ -15,8 +15,17 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class BedrockBone {
-    private static final Vector3f[] NORMALS = new Vector3f[6];
-    private static final int MAX_LIGHT_TEXTURE = LightTexture.pack(15, 15);
+    @OnlyIn(Dist.CLIENT)
+    private static class ClientConstants {
+        private static final Vector3f[] NORMALS = new Vector3f[6];
+        private static final int MAX_LIGHT_TEXTURE = LightTexture.pack(15, 15);
+
+        static {
+            for (int i = 0; i < ClientConstants.NORMALS.length; i++) {
+                ClientConstants.NORMALS[i] = new Vector3f();
+            }
+        }
+    }
 
     public final ObjectList<BedrockCube> cubes = new ObjectArrayList<>();
     private final ObjectList<BedrockBone> children = new ObjectArrayList<>();
@@ -35,12 +44,6 @@ public class BedrockBone {
     public boolean illuminated = false;
     public boolean mirror;
 
-    static {
-        for (int i = 0; i < NORMALS.length; i++) {
-            NORMALS[i] = new Vector3f();
-        }
-    }
-
     @OnlyIn(Dist.CLIENT)
     public void render(PoseStack poseStack, VertexConsumer consumer, int lightmap, int overlay) {
         this.render(poseStack, consumer, lightmap, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
@@ -48,7 +51,7 @@ public class BedrockBone {
 
     @OnlyIn(Dist.CLIENT)
     public void render(PoseStack poseStack, VertexConsumer consumer, int lightmap, int overlay, float red, float green, float blue, float alpha) {
-        int cubePackedLight = illuminated ? MAX_LIGHT_TEXTURE : lightmap;
+        int cubePackedLight = illuminated ?  ClientConstants.MAX_LIGHT_TEXTURE : lightmap;
         if (this.visible) {
             // 缩放过小时，直接退出渲染
             boolean xNearZero = -1E-5F < xScale && xScale < 1E-5F;
@@ -85,14 +88,14 @@ public class BedrockBone {
     @OnlyIn(Dist.CLIENT)
     private void compile(PoseStack.Pose pose, VertexConsumer consumer, int lightmap, int overlay, float red, float green, float blue, float alpha) {
         Matrix3f normal = pose.normal();
-        NORMALS[0].set(-normal.m10, -normal.m11, -normal.m12);
-        NORMALS[1].set(normal.m10, normal.m11, normal.m12);
-        NORMALS[2].set(-normal.m20, -normal.m21, -normal.m22);
-        NORMALS[3].set(normal.m20, normal.m21, normal.m22);
-        NORMALS[4].set(-normal.m00, -normal.m01, -normal.m02);
-        NORMALS[5].set(normal.m00, normal.m01, normal.m02);
+        ClientConstants.NORMALS[0].set(-normal.m10, -normal.m11, -normal.m12);
+        ClientConstants.NORMALS[1].set(normal.m10, normal.m11, normal.m12);
+        ClientConstants.NORMALS[2].set(-normal.m20, -normal.m21, -normal.m22);
+        ClientConstants.NORMALS[3].set(normal.m20, normal.m21, normal.m22);
+        ClientConstants.NORMALS[4].set(-normal.m00, -normal.m01, -normal.m02);
+        ClientConstants.NORMALS[5].set(normal.m00, normal.m01, normal.m02);
         for (BedrockCube bedrockCube : this.cubes) {
-            bedrockCube.compile(pose, NORMALS, consumer, lightmap, overlay, red, green, blue, alpha);
+            bedrockCube.compile(pose, ClientConstants.NORMALS, consumer, lightmap, overlay, red, green, blue, alpha);
         }
     }
 
